@@ -1,0 +1,59 @@
+<view class="container">
+
+  <!--幻灯片-->
+  <view class='selection'>
+   <swiper indicator-dots="true"
+    autoplay="true" interval="3000" duration="1000">
+    <block wx:for="{{imgUrls}}">
+      <swiper-item>
+        <image mode='{{aspectFill}}' src="{{item}}" class="slide-image" style="width: 100%; height: 200px;"></image>
+      </swiper-item>
+    </block>
+    </swiper>
+  </view>
+
+  <!--精品推荐-->
+  <view class="selection" >
+    <view class="header">
+      <text>精品推荐</text>
+      <text class="text-all">全部精品</text>
+    </view>
+
+    <!--图片标题-->
+    <view class="content">
+      <view class="content-item" wx:for="{{contentItems}}">
+        <image src="../../images/timg.jpg" />
+        <view class='content-item-text'>
+          <text>这里是标题</text>
+        </view>
+      </view>
+
+    </view>
+  </view>
+
+  <!--热门评测-->
+  <view class="selection">
+    <view class='header'>
+      <text>热门评测</text>
+      <text class='text-all'>全部评测</text>
+    </view>
+
+    <view class='list-item' wx:for="{{listItems}}">
+      <!--图片-->
+      <view class='list-item-images'>
+        <image src='../../images/timg.jpg' class='list-item-images-img'/>
+        <image src='../../images/img.jpg' class='avatar'/>
+      </view>
+      <!--评测内容-->
+      <view class='lsit-item-text'>
+        <view class='lsit-item-text-title'>
+          <text>标题</text>
+        </view>
+        <view class='lsit-item-text-content'>
+          <text>这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容</text>
+        </view>
+      </view>
+    </view>
+  
+  </view>
+</view>
