@@ -19,12 +19,12 @@ public class Monkey implements Runnable{
   private final Map<Ladder, List<Map<Rung, Monkey>>> ladders = null;
   private final int ID = 0;// ���
   private final String direction = null;// ����
-  private int v = 0;// ��ʼ�ٶ�
-  private boolean onRung = false;// �ú����Ƿ��ڰ���
-  private CountDownLatch threadsSignal;// �ȴ����߳̽���
-  private int realv = 0;
-  private int borntime = 0;// ����ʱ�䣬���ڼ��㹫ƽ�Ե�
-  private ChoseBridge strategy;
+  private final int v = 0;// ��ʼ�ٶ�
+  private final boolean onRung = false;// �ú����Ƿ��ڰ���
+  private final CountDownLatch threadsSignal;// �ȴ����߳̽���
+  private final int realv = 0;
+  private final int borntime = 0;// ����ʱ�䣬���ڼ��㹫ƽ�Ե�
+  private final ChoseBridge strategy;
 //  private Ladder ladderlock = new Ladder(0, "1");// rung��
   
   // RI:
