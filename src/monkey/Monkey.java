@@ -11,43 +11,43 @@ import strategy.ChoseBridge;
 import strategy.Closestrealspeed;
 
 /**
- * ºï×ÓÊý¾Ý½á¹¹.
- * @author Íõ³Ì
+ * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý½á¹¹.
+ * @author ï¿½ï¿½ï¿½ï¿½
  *
  */
 public class Monkey implements Runnable{
-  private Map<Ladder, List<Map<Rung, Monkey>>> ladders = null;
-  private int ID = 0;// ±àºÅ
-  private String direction = null;// ·½Ïò
-  private int v = 0;// ³õÊ¼ËÙ¶È
-  private boolean onRung = false;// ¸Ãºï×ÓÊÇ·ñÔÚ°åÉÏ
-  private CountDownLatch threadsSignal;// µÈ´ý×ÓÏß³Ì½áÊø
-  private int realv = 0;
-  private int borntime = 0;// ³öÉúÊ±¼ä£¬ÓÃÓÚ¼ÆËã¹«Æ½ÐÔµÄ
-  private ChoseBridge strategy;
-//  private Ladder ladderlock = new Ladder(0, "1");// rungËø
+  private final Map<Ladder, List<Map<Rung, Monkey>>> ladders = null;
+  private final int ID = 0;// ï¿½ï¿½ï¿½
+  private final String direction = null;// ï¿½ï¿½ï¿½ï¿½
+  private final int v = 0;// ï¿½ï¿½Ê¼ï¿½Ù¶ï¿½
+  private final boolean onRung = false;// ï¿½Ãºï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ú°ï¿½ï¿½ï¿½
+  private final CountDownLatch threadsSignal;// ï¿½È´ï¿½ï¿½ï¿½ï¿½ß³Ì½ï¿½ï¿½ï¿½
+  private final int realv = 0;
+  private final int borntime = 0;// ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ä£¬ï¿½ï¿½ï¿½Ú¼ï¿½ï¿½ã¹«Æ½ï¿½Ôµï¿½
+  private final ChoseBridge strategy;
+//  private Ladder ladderlock = new Ladder(0, "1");// rungï¿½ï¿½
   
   // RI:
-  //    IDÊÇ×ÔÈ»Êý
-  //    directionÊÇstringÀàÐÍ£¬Ö»ÄÜÊÇ£ºR->L»òL->R
-  //    vÊÇÕýÕûÊý£¬ÔÚ[1,MV]Ö®¼ä
-  //    threadsSignalÀïµÄ¸öÊý²»ÄÜÎª¸ºÊý
+  //    IDï¿½ï¿½ï¿½ï¿½È»ï¿½ï¿½
+  //    directionï¿½ï¿½stringï¿½ï¿½ï¿½Í£ï¿½Ö»ï¿½ï¿½ï¿½Ç£ï¿½R->Lï¿½ï¿½L->R
+  //    vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[1,MV]Ö®ï¿½ï¿½
+  //    threadsSignalï¿½ï¿½Ä¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½
   //
   // AF:
-  //    Õû¸öADT±íÊ¾Ò»Ö»ÒÑ¾­×¼±¸¹ýÌÝ×ÓµÄºï×Ó.
+  //    ï¿½ï¿½ï¿½ï¿½ADTï¿½ï¿½Ê¾Ò»Ö»ï¿½Ñ¾ï¿½×¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÓµÄºï¿½ï¿½ï¿½.
   //
   // safety from rep exposure:
-  //    Ö»ÓÐÁ½¸ö·µ»Ø·½·¨£º
-  //      getID·µ»ØµÄIDÊÇÒ»¸ö»ù±¾Êý¾ÝÀàÐÍ
-  //      getDirection·µ»ØÊ±½øÐÐ·ÀÓùÐÔ¿½±´
+  //    Ö»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø·ï¿½ï¿½ï¿½ï¿½ï¿½
+  //      getIDï¿½ï¿½ï¿½Øµï¿½IDï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  //      getDirectionï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ð·ï¿½ï¿½ï¿½ï¿½Ô¿ï¿½ï¿½ï¿½
   
   /**
-   * Í¨¹ý²ÎÊý¹¹ÔìÒ»Ö»ÐÂºï×Ó.
-   * @param ID ºï×ÓµÄ±àºÅ£¬×ÔÈ»Êý.
-   * @param v ºï×ÓµÄËÙ¶È£¬ÊôÓÚ[1,MV]µÄÕûÊý.
-   * @param ladders µ±Ç°ËùÓÐÌÝ×Ó£¬ÓÃÓÚºï×Ó»ñÖªÌÝ×Ó×´Ì¬.
-   * @param direction ºï×ÓÐèÒªµÄÇ°½ø·½Ïò.
-   * @param threadsSignal µ±ºï×Ó¹ýºÓºóÔÚÎ¬»¤µÄ½ø³ÌÁÐ±íÖÐ½«¸Ã½ø³ÌÉ¾³ý.
+   * Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»Ö»ï¿½Âºï¿½ï¿½ï¿½.
+   * @param ID ï¿½ï¿½ï¿½ÓµÄ±ï¿½Å£ï¿½ï¿½ï¿½È»ï¿½ï¿½.
+   * @param v ï¿½ï¿½ï¿½Óµï¿½ï¿½Ù¶È£ï¿½ï¿½ï¿½ï¿½ï¿½[1,MV]ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
+   * @param ladders ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó£ï¿½ï¿½ï¿½ï¿½Úºï¿½ï¿½Ó»ï¿½Öªï¿½ï¿½ï¿½ï¿½×´Ì¬.
+   * @param direction ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
+   * @param threadsSignal ï¿½ï¿½ï¿½ï¿½ï¿½Ó¹ï¿½ï¿½Óºï¿½ï¿½ï¿½Î¬ï¿½ï¿½ï¿½Ä½ï¿½ï¿½ï¿½ï¿½Ð±ï¿½ï¿½Ð½ï¿½ï¿½Ã½ï¿½ï¿½ï¿½É¾ï¿½ï¿½.
    */
   public Monkey(int ID, int v, Map<Ladder, List<Map<Rung, Monkey>>> ladders, String direction, CountDownLatch threadsSignal, int borntime, ChoseBridge strategy) {
     this.ID = ID;
@@ -61,55 +61,55 @@ public class Monkey implements Runnable{
   }
 
   /**
-   * ·µ»ØID.
-   * @return ·µ»Øºï×ÓµÄID£¬ºÍ¹¹ÔìÊ±µÄÒ»Ñù.
+   * ï¿½ï¿½ï¿½ï¿½ID.
+   * @return ï¿½ï¿½ï¿½Øºï¿½ï¿½Óµï¿½IDï¿½ï¿½ï¿½Í¹ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ò»ï¿½ï¿½.
    */
   public int getID() {
     return this.ID;
   }
   
   /**
-   * ·µ»Ø·½Ïò.
-   * @return ºÍ¹¹ÔìÊ±µÄÒ»Ñù.
+   * ï¿½ï¿½ï¿½Ø·ï¿½ï¿½ï¿½.
+   * @return ï¿½Í¹ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ò»ï¿½ï¿½.
    */
   public String getDirection() {
     return this.direction;
   }
   
   /**
-   * ·µ»ØËÙ¶È.
-   * @return ºÍ¹¹ÔìÊ±µÄÒ»Ñù.
+   * ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½.
+   * @return ï¿½Í¹ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ò»ï¿½ï¿½.
    */
   public int getV() {
     return this.v;
   }
   
   /**
-   *  ·µ»ØÕæÊµËÙ¶È.
+   *  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½Ù¶ï¿½.
    */
   public int getRealV() {
     return this.realv;
   }
   
   /**
-   * ·µ»Ø³öÉúÊ±¼ä.
-   * @return ÕýÕûÊý.
+   * ï¿½ï¿½ï¿½Ø³ï¿½ï¿½ï¿½Ê±ï¿½ï¿½.
+   * @return ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
    */
   public int getBorntime() {
     return this.borntime;
   }
   
   /**
-   * ÖØÐ´run£¬½øÐÐÏß³ÌÄÚÈÝ.
+   * ï¿½ï¿½Ð´runï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½ï¿½ï¿½ï¿½ï¿½.
    */
   @Override
   public void run() {
-    Ladder chosenladder = null;// Ñ¡ÔñµÄÌÝ×Ó
-    List<Map<Rung, Monkey>> rungs = new ArrayList<Map<Rung,Monkey>>();// ¸ÃÌÝ×ÓÉÏµÄ°å
-    int h = 0;// °å×Ó¸öÊý
+    Ladder chosenladder = null;// Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    List<Map<Rung, Monkey>> rungs = new ArrayList<Map<Rung,Monkey>>();// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÏµÄ°ï¿½
+    int h = 0;// ï¿½ï¿½ï¿½Ó¸ï¿½ï¿½ï¿½
     
     synchronized (this) {
-      // ²ßÂÔÑ¡ÔñÌÝ×Ó
+      // ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
       while (!this.onRung) {
         chosenladder = this.strategy.chosenbridge(this, ladders);
         rungs = ladders.get(chosenladder);
@@ -118,12 +118,12 @@ public class Monkey implements Runnable{
         }
         h = rungs.size();
         synchronized (rungs) {
-          // Ñ¡ºÃÈô¿ÕÖ±½ÓÉÏÌÝ×Ó
+          // Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
           // L->R
           if(this.direction.equals("L->R") && chosenladder.getdirection().equals("L->R")) {
             if (rungs.get(0).get(new Rung(1)) == null) {
               rungs.get(0).put(new Rung(1), this);
-              Simulator.writelog("ÌÝ×ÓÎª" + chosenladder.getID() + ":" + "IDÎª" + this.getID() + "µÄºï×ÓÉÏIDÎª" + chosenladder.getID() + "µÄÌÝ×Ó, µ±Ç°Î»ÖÃÎª" + 1);
+              Simulator.writelog("ï¿½ï¿½ï¿½ï¿½Îª" + chosenladder.getID() + ":" + "IDÎª" + this.getID() + "ï¿½Äºï¿½ï¿½ï¿½ï¿½ï¿½IDÎª" + chosenladder.getID() + "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½Ç°Î»ï¿½ï¿½Îª" + 1);
               this.onRung = true;
             }
           }
@@ -131,7 +131,7 @@ public class Monkey implements Runnable{
           if(this.direction.equals("R->L") && chosenladder.getdirection().equals("R->L")) {
             if (rungs.get(h-1).get(new Rung(h)) == null) {
               rungs.get(h-1).put(new Rung(h), this);
-              Simulator.writelog("ÌÝ×ÓÎª" + chosenladder.getID() + ":" + "IDÎª" + this.getID() + "µÄºï×ÓÉÏIDÎª" + chosenladder.getID() + "µÄÌÝ×Ó, µ±Ç°Î»ÖÃÎª" + h);
+              Simulator.writelog("ï¿½ï¿½ï¿½ï¿½Îª" + chosenladder.getID() + ":" + "IDÎª" + this.getID() + "ï¿½Äºï¿½ï¿½ï¿½ï¿½ï¿½IDÎª" + chosenladder.getID() + "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½Ç°Î»ï¿½ï¿½Îª" + h);
               this.onRung = true;
             }
           }
@@ -140,7 +140,7 @@ public class Monkey implements Runnable{
     }
     
     if (!this.onRung) {
-      // µÈ´ýÉÏÌÝ×Ó
+      // ï¿½È´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
       // L->R
       if(this.direction.equals("L->R")) {
         while(rungs.get(0).get(new Rung(1)) != null && !rungs.get(0).get(new Rung(1)).equals(this));
@@ -152,12 +152,12 @@ public class Monkey implements Runnable{
     }
     
     if (!this.onRung) {
-      // ÉÏÌÝ×Ó
+      // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
       synchronized (rungs) {
         // L->R
         if(this.direction.equals("L->R") && chosenladder.getdirection().equals("L->R")) {
           if (rungs.get(0).get(new Rung(1)) == null) {
-            Simulator.writelog("ÌÝ×ÓÎª" + chosenladder.getID() + ":" + "IDÎª" + this.getID() + "µÄºï×ÓÉÏIDÎª" + chosenladder.getID() + "µÄÌÝ×Ó, µ±Ç°Î»ÖÃÎª" + 1);
+            Simulator.writelog("ï¿½ï¿½ï¿½ï¿½Îª" + chosenladder.getID() + ":" + "IDÎª" + this.getID() + "ï¿½Äºï¿½ï¿½ï¿½ï¿½ï¿½IDÎª" + chosenladder.getID() + "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½Ç°Î»ï¿½ï¿½Îª" + 1);
             rungs.get(0).put(new Rung(1), this);
             this.onRung = true;
           }
@@ -165,7 +165,7 @@ public class Monkey implements Runnable{
         // R->L
         if(this.direction.equals("R->L") && chosenladder.getdirection().equals("R->L")) {
           if (rungs.get(h-1).get(new Rung(h)) == null) {
-            Simulator.writelog("ÌÝ×ÓÎª" + chosenladder.getID() + ":" + "IDÎª" + this.getID() + "µÄºï×ÓÉÏIDÎª" + chosenladder.getID() + "µÄÌÝ×Ó, µ±Ç°Î»ÖÃÎª" + h);
+            Simulator.writelog("ï¿½ï¿½ï¿½ï¿½Îª" + chosenladder.getID() + ":" + "IDÎª" + this.getID() + "ï¿½Äºï¿½ï¿½ï¿½ï¿½ï¿½IDÎª" + chosenladder.getID() + "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½Ç°Î»ï¿½ï¿½Îª" + h);
             rungs.get(h-1).put(new Rung(h), this);
             this.onRung = true;
           }
@@ -173,17 +173,17 @@ public class Monkey implements Runnable{
       }
     }
     
-    // Ç°½ø
+    // Ç°ï¿½ï¿½
     if(this.onRung) {
       // L->R
       if(this.direction.equals("L->R")) {
-        int selfposition = 0;// ¼ÇÂ¼×Ô¼ºµ±Ç°Î»ÖÃ(Êý×éÏÂ±ê£¬Êµ¼ÊÉÏµÈÓÚID-1)
-        boolean resist = false;// ¼ÆËãÇ°·½ÓÐÃ»ÓÐºï×Ó×èµ²
-        int frontposition = 0;// ¼ÇÂ¼Ç°·½×èµ²ºï×ÓµÄÎ»ÖÃ
+        int selfposition = 0;// ï¿½ï¿½Â¼ï¿½Ô¼ï¿½ï¿½ï¿½Ç°Î»ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½Â±ê£¬Êµï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ID-1)
+        boolean resist = false;// ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½Ã»ï¿½Ðºï¿½ï¿½ï¿½ï¿½èµ²
+        int frontposition = 0;// ï¿½ï¿½Â¼Ç°ï¿½ï¿½ï¿½èµ²ï¿½ï¿½ï¿½Óµï¿½Î»ï¿½ï¿½
         
         while (true) {
           synchronized (rungs) {
-            // ¼ì²éÇ°·½vÄÚÊÇ·ñÓÐºï×Ó
+            // ï¿½ï¿½ï¿½Ç°ï¿½ï¿½vï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ðºï¿½ï¿½ï¿½
             resist = false;
             for(int i = selfposition + 1;i <= selfposition + this.v;i++) {
               if(i <= h-1 && rungs.get(i).get(new Rung(i+1)) != null) {
@@ -195,40 +195,40 @@ public class Monkey implements Runnable{
               }
             }
               
-            // Ç°·½<=v ÄÚÃ»ºï×Ó,±£³Ö×Ô¼ºµÄËÙÂÊ
+            // Ç°ï¿½ï¿½<=v ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             if(!resist) {
-              realv = v;// Ã»×èÈûÔòÎª×Ô¼ºËÙ¶È
-              // ÀëÖÕµã´óÓÚv
+              realv = v;// Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½Ô¼ï¿½ï¿½Ù¶ï¿½
+              // ï¿½ï¿½ï¿½Õµï¿½ï¿½ï¿½ï¿½v
               if (selfposition + this.v <= h-1) {
                 rungs.get(selfposition + v).put(new Rung(selfposition + v + 1), this);
                 rungs.get(selfposition).put(new Rung(selfposition + 1), null);
-                Simulator.writelog("ÌÝ×ÓÎª" + chosenladder.getID() + ":" + "IDÎª" + this.getID() + "µÄºï×Ó´ÓÎ»ÖÃ" + selfposition + "µ½´ïÎ»ÖÃ" + (selfposition + v));
+                Simulator.writelog("ï¿½ï¿½ï¿½ï¿½Îª" + chosenladder.getID() + ":" + "IDÎª" + this.getID() + "ï¿½Äºï¿½ï¿½Ó´ï¿½Î»ï¿½ï¿½" + selfposition + "ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½" + (selfposition + v));
                 selfposition += v;
-              }else {// Ö±½Óµ½¶Ô°¶
+              }else {// Ö±ï¿½Óµï¿½ï¿½Ô°ï¿½
                 rungs.get(selfposition).put(new Rung(selfposition + 1), null);
-                // µ½´ï¶Ô°¶½áÊø½ø³Ì
-                System.out.println("ÌÝ×ÓÎª" + chosenladder.getID() + ":" + "IDÎª" + String.valueOf(this.ID) + "µÄºï×ÓÒÑ¾­µ½´ï¶Ô°¶");
-                Simulator.writelog("ÌÝ×ÓÎª" + chosenladder.getID() + ":" + "IDÎª" + String.valueOf(this.ID) + "µÄºï×ÓÒÑ¾­µ½´ï¶Ô°¶");
+                // ï¿½ï¿½ï¿½ï¿½Ô°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+                System.out.println("ï¿½ï¿½ï¿½ï¿½Îª" + chosenladder.getID() + ":" + "IDÎª" + String.valueOf(this.ID) + "ï¿½Äºï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½Ô°ï¿½");
+                Simulator.writelog("ï¿½ï¿½ï¿½ï¿½Îª" + chosenladder.getID() + ":" + "IDÎª" + String.valueOf(this.ID) + "ï¿½Äºï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½Ô°ï¿½");
                 Simulator.monkeys.remove(this);
-                threadsSignal.countDown();//Ïß³Ì½áÊøÊ±¼ÆÊýÆ÷¼õ1
+                threadsSignal.countDown();//ï¿½ß³Ì½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1
                 return;
               }
             }
               
-            // Ç°·½<=v ÄÚÓÐºï×Ó,ÅÜµ½ËüµÄºóÃæ
+            // Ç°ï¿½ï¿½<=v ï¿½ï¿½ï¿½Ðºï¿½ï¿½ï¿½,ï¿½Üµï¿½ï¿½ï¿½ï¿½Äºï¿½ï¿½ï¿½
             if(resist) {
-              this.realv = rungs.get(frontposition).get(new Rung(frontposition + 1)).v;// ×èÈûÔòÎªÇ°·½ºï×ÓËÙ¶È
+              this.realv = rungs.get(frontposition).get(new Rung(frontposition + 1)).v;// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªÇ°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
               rungs.get(frontposition - 1).put(new Rung(frontposition), this);
-              Simulator.writelog("ÌÝ×ÓÎª" + chosenladder.getID() + ":" + "IDÎª" + this.getID() + "µÄºï×Ó´ÓÎ»ÖÃ" + selfposition + "µ½´ïÎ»ÖÃ" + (frontposition - 1));
-              // ÈôÔ­µØ²»¶¯Ôò²»É¾³ýÔ­À´Î»ÖÃºï×Ó
+              Simulator.writelog("ï¿½ï¿½ï¿½ï¿½Îª" + chosenladder.getID() + ":" + "IDÎª" + this.getID() + "ï¿½Äºï¿½ï¿½Ó´ï¿½Î»ï¿½ï¿½" + selfposition + "ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½" + (frontposition - 1));
+              // ï¿½ï¿½Ô­ï¿½Ø²ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½Ô­ï¿½ï¿½Î»ï¿½Ãºï¿½ï¿½ï¿½
               if(selfposition != (frontposition - 1)) {
                 rungs.get(selfposition).put(new Rung(selfposition + 1), null);
-                Simulator.writelog("ÌÝ×ÓÎª" + chosenladder.getID() + ":" + "IDÎª" + this.getID() + "µÄºï×ÓÔÚÎ»ÖÃ" + selfposition + "±»×èÈû£¬Ö»ÄÜµÈ´ý");
+                Simulator.writelog("ï¿½ï¿½ï¿½ï¿½Îª" + chosenladder.getID() + ":" + "IDÎª" + this.getID() + "ï¿½Äºï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½" + selfposition + "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö»ï¿½ÜµÈ´ï¿½");
               }
               selfposition = frontposition - 1;
             }
           }
-          // 1Ãë¾ö²ßÒ»´Î
+          // 1ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
           try {
             Thread.sleep(1000);
           } catch (InterruptedException e) {
@@ -239,13 +239,13 @@ public class Monkey implements Runnable{
       }
       // R->L
       if(this.direction.equals("R->L")) {
-        int selfposition = h-1;// ¼ÇÂ¼×Ô¼ºµ±Ç°Î»ÖÃ(Êý×éÏÂ±ê£¬Êµ¼ÊÉÏµÈÓÚID-1)
-        boolean resist = false;// ¼ÆËãÇ°·½ÓÐÃ»ÓÐºï×Ó×èµ²
-        int frontposition = 0;// ¼ÇÂ¼Ç°·½×èµ²ºï×ÓµÄÎ»ÖÃ
+        int selfposition = h-1;// ï¿½ï¿½Â¼ï¿½Ô¼ï¿½ï¿½ï¿½Ç°Î»ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½Â±ê£¬Êµï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ID-1)
+        boolean resist = false;// ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½Ã»ï¿½Ðºï¿½ï¿½ï¿½ï¿½èµ²
+        int frontposition = 0;// ï¿½ï¿½Â¼Ç°ï¿½ï¿½ï¿½èµ²ï¿½ï¿½ï¿½Óµï¿½Î»ï¿½ï¿½
         
         while (true) {
           synchronized (rungs) {
-            // ¼ì²éÇ°·½vÄÚÊÇ·ñÓÐºï×Ó
+            // ï¿½ï¿½ï¿½Ç°ï¿½ï¿½vï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ðºï¿½ï¿½ï¿½
             resist = false;
             for(int i = selfposition - 1;i >= selfposition - this.v;i--) {
               if(i >= 0 && rungs.get(i).get(new Rung(i+1)) != null) {
@@ -257,42 +257,42 @@ public class Monkey implements Runnable{
               }
             }
               
-            // Ç°·½<=v ÄÚÃ»ºï×Ó,±£³Ö×Ô¼ºµÄËÙÂÊ
+            // Ç°ï¿½ï¿½<=v ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             if(!resist) {
-              realv = v;// Ã»×èÈûÔòÎª×Ô¼ºËÙ¶È
-              // ÀëÖÕµã´óÓÚv
+              realv = v;// Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½Ô¼ï¿½ï¿½Ù¶ï¿½
+              // ï¿½ï¿½ï¿½Õµï¿½ï¿½ï¿½ï¿½v
               if (selfposition - this.v >= 0) {
                 rungs.get(selfposition - v).put(new Rung(selfposition - v + 1), this);
                 rungs.get(selfposition).put(new Rung(selfposition + 1), null);
-                Simulator.writelog("ÌÝ×ÓÎª" + chosenladder.getID() + ":" + "IDÎª" + this.getID() + "µÄºï×Ó´ÓÎ»ÖÃ" + selfposition + "µ½´ïÎ»ÖÃ" + (selfposition - v));
+                Simulator.writelog("ï¿½ï¿½ï¿½ï¿½Îª" + chosenladder.getID() + ":" + "IDÎª" + this.getID() + "ï¿½Äºï¿½ï¿½Ó´ï¿½Î»ï¿½ï¿½" + selfposition + "ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½" + (selfposition - v));
                 selfposition -= v;
-              }else {// Ö±½Óµ½¶Ô°¶
+              }else {// Ö±ï¿½Óµï¿½ï¿½Ô°ï¿½
                 rungs.get(selfposition).put(new Rung(selfposition + 1), null);
-                System.out.println("ÌÝ×ÓÎª" + chosenladder.getID() + ":" + "IDÎª" + String.valueOf(this.ID) + "µÄºï×ÓÒÑ¾­µ½´ï¶Ô°¶");
+                System.out.println("ï¿½ï¿½ï¿½ï¿½Îª" + chosenladder.getID() + ":" + "IDÎª" + String.valueOf(this.ID) + "ï¿½Äºï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½Ô°ï¿½");
 
-                // µ½´ï¶Ô°¶½áÊø½ø³Ì
-                System.out.println("ÌÝ×ÓÎª" + chosenladder.getID() + ":" + "IDÎª" + String.valueOf(this.ID) + "µÄºï×ÓÒÑ¾­µ½´ï¶Ô°¶");
-                Simulator.monkeys.remove(this);// É¾³ý¸Ãºï×Ó
-                threadsSignal.countDown();//Ïß³Ì½áÊøÊ±¼ÆÊýÆ÷¼õ1
-                Simulator.monkeyssequence.add(this);// ¼ÓÈëµ½¹ýºÓÐòÁÐÖÐ
+                // ï¿½ï¿½ï¿½ï¿½Ô°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+                System.out.println("ï¿½ï¿½ï¿½ï¿½Îª" + chosenladder.getID() + ":" + "IDÎª" + String.valueOf(this.ID) + "ï¿½Äºï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½Ô°ï¿½");
+                Simulator.monkeys.remove(this);// É¾ï¿½ï¿½ï¿½Ãºï¿½ï¿½ï¿½
+                threadsSignal.countDown();//ï¿½ß³Ì½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1
+                Simulator.monkeyssequence.add(this);// ï¿½ï¿½ï¿½ëµ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                 return;
               }
             }
               
-            // Ç°·½<=v ÄÚÓÐºï×Ó,ÅÜµ½ËüµÄºóÃæ
+            // Ç°ï¿½ï¿½<=v ï¿½ï¿½ï¿½Ðºï¿½ï¿½ï¿½,ï¿½Üµï¿½ï¿½ï¿½ï¿½Äºï¿½ï¿½ï¿½
             if(resist) {
-              this.realv = rungs.get(frontposition).get(new Rung(frontposition + 1)).v;// ×èÈûÔòÎªÇ°·½ºï×ÓËÙ¶È
+              this.realv = rungs.get(frontposition).get(new Rung(frontposition + 1)).v;// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªÇ°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
               rungs.get(frontposition + 1).put(new Rung(frontposition + 2), this);
-              Simulator.writelog("ÌÝ×ÓÎª" + chosenladder.getID() + ":" + "IDÎª" + this.getID() + "µÄºï×Ó´ÓÎ»ÖÃ" + selfposition + "µ½´ïÎ»ÖÃ" + (frontposition + 2));
-              // ÈôÔ­µØ²»¶¯Ôò²»É¾³ýÔ­À´Î»ÖÃºï×Ó
+              Simulator.writelog("ï¿½ï¿½ï¿½ï¿½Îª" + chosenladder.getID() + ":" + "IDÎª" + this.getID() + "ï¿½Äºï¿½ï¿½Ó´ï¿½Î»ï¿½ï¿½" + selfposition + "ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½" + (frontposition + 2));
+              // ï¿½ï¿½Ô­ï¿½Ø²ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½Ô­ï¿½ï¿½Î»ï¿½Ãºï¿½ï¿½ï¿½
               if(selfposition != (frontposition + 1)) {
                 rungs.get(selfposition).put(new Rung(selfposition + 1), null);
-                Simulator.writelog("ÌÝ×ÓÎª" + chosenladder.getID() + ":" + "IDÎª" + this.getID() + "µÄºï×ÓÔÚÎ»ÖÃ" + selfposition + "±»×èÈû£¬Ö»ÄÜµÈ´ý");
+                Simulator.writelog("ï¿½ï¿½ï¿½ï¿½Îª" + chosenladder.getID() + ":" + "IDÎª" + this.getID() + "ï¿½Äºï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½" + selfposition + "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö»ï¿½ÜµÈ´ï¿½");
               }
               selfposition = frontposition + 1;
             }
           }
-          // 1Ãë¾ö²ßÒ»´Î
+          // 1ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
           try {
             Thread.sleep(1000);
           } catch (InterruptedException e) {
@@ -303,4 +303,22 @@ public class Monkey implements Runnable{
       }
     }
   }
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ID;
+    return result;
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    Rung other = (Rung) obj;
+    if (ID != other.getID()) return false;
+    return true;
+  }
 }
+  
